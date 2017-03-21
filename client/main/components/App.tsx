@@ -1,45 +1,58 @@
-import { Dispatch } from 'redux';
+import { Dispatch, bindActionCreators, Action } from 'redux';
 import { connect } from 'react-redux';
 import * as React from 'react';
 
 import {
   Header,
+  searchUsers,
+  inputUser,
+  clearUsers,
   MainSection,
   model,
-  addTodo,
-  editTodo,
-  clearCompleted,
-  completeAll,
-  completeTodo,
-  deleteTodo
-} from '../../todos';
+} from '../../typehead';
 
 interface AppProps {
-  todos: model.Todo[];
+  users: model.User[];
+  user: string;
   dispatch: Dispatch<{}>;
+  searchUsers: (text: string) => any;
+  inputUser: (text: string) => any;
+  clearUsers: () => any;
 }
 
 class App extends React.Component<AppProps, void> {
   render() {
-    const { todos, dispatch } = this.props;
+    const { users, user, dispatch, searchUsers, inputUser, clearUsers } = this.props;
 
     return (
       <div className="todoapp">
-        <Header addTodo={(text: string) => dispatch(addTodo(text))} />
-        <MainSection
-            todos={todos}
-            editTodo={(t,s) => dispatch(editTodo(t, s))}
-            deleteTodo={(t: model.Todo) => dispatch(deleteTodo(t))}
-            completeTodo={(t: model.Todo) => dispatch(completeTodo(t))}
-            clearCompleted={() => dispatch(clearCompleted())}
-            completeAll={() => dispatch(completeAll())}/>
+        <Header searchUsers={searchUsers}
+          inputUser={inputUser}
+          user={user} />
+        <MainSection users={users}
+          inputUser={inputUser}
+          clearUsers={clearUsers} />
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  todos: state.todos
+  users: state.users,
+  user: state.user
 });
 
-export default connect(mapStateToProps)(App);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    searchUsers: (text: string) => {
+      dispatch(searchUsers(text))
+    },
+    inputUser: (text: string) => {
+      dispatch(inputUser(text))
+    },
+    clearUsers: () => {
+      dispatch(clearUsers())
+    },
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App);
